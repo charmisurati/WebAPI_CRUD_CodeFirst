@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using WebAPI_CRUD_Methods.DBContext;
 using WebAPI_CRUD_Methods.Models;
@@ -19,15 +21,18 @@ namespace WebAPI_CRUD_Methods.Controllers
         }
 
         // GET api/values
-        public IEnumerable<string> Get()
+        [ActionName("GetAllEmployee")]
+        public IEnumerable<Employee> Get()
         {
-            return new string[] { "value1", "value2" };
+            return this.employeeDBContext.employees.ToList();
+
         }
 
-        // GET api/values/5
-        public string Get(int id)
+        // GET api/values/5        
+        [ActionName("GetEmployeeById")]
+        public async Task<Employee> Get(int id)
         {
-            return "value";
+            return await this.employeeDBContext.employees.Where(x => x.Id == id).FirstAsync();
         }
 
         // POST api/values
@@ -46,8 +51,12 @@ namespace WebAPI_CRUD_Methods.Controllers
         }
 
         // DELETE api/values/5
+        [ActionName("DeleteEmployeeById")]
         public void Delete(int id)
         {
+            Employee emp = this.employeeDBContext.employees.Where(x => x.Id == id).First();
+            this.employeeDBContext.employees.Remove(emp);
+            this.employeeDBContext.SaveChanges();
         }
     }
 }
